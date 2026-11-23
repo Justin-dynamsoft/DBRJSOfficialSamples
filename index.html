@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Samples for the Dynamsoft Barcode Reader JavaScript SDK. Open any sample on your phone via QR code and scan the barcode images shown on this page.">
+  <link rel="canonical" href="https://demo.dynamsoft.com/Samples/DBR/JS/index.html">
+  <title>Dynamsoft Barcode Reader - JavaScript Samples</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+            --panel: #fff;
+            --ink: #1b1f2a;
+            --ink-soft: #5b6472;
+            --line: #e3e7ef;
+            --brand: #2b5bd7;
+            --brand-soft: #eaf0ff;
+      --radius: 12px;
+      --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .06);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1360px; margin: 0 auto; padding: 20px 24px 60px; }
+    .show-mobile { display: none; }
+
+    /* header */
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 0 20px; flex-wrap: wrap; }
+    .brand { display: inline-flex; height: 34px; }
+    .brand svg { height: 100%; }
+    .top-links { display: flex; gap: 18px; flex-wrap: wrap; }
+    .top-links a { color: var(--ink-soft); font-weight: 600; }
+    .top-links a:hover { color: var(--brand); text-decoration: none; }
+
+    /* handoff banner */
+    .handoff {
+      display: block;
+      background: linear-gradient(120deg, #1f2a50, #2b5bd7);
+      color: #fff;
+      border-radius: 16px;
+      padding: 28px 32px;
+      box-shadow: var(--shadow);
+    }
+    .handoff h1 { margin: 0 0 10px; font-size: 24px; line-height: 1.3; }
+          .handoff p { margin: 0 0 14px; color: #dbe4ff; }
+          .steps-row { display: flex; gap: 20px; align-items: flex-start; margin: 0 0 18px; padding: 14px 16px; border-radius: 10px; background: rgba(0, 0, 0, .18); border: 1px solid rgba(255, 255, 255, .22); }
+          .steps { margin: 0; padding-left: 20px; color: #dbe4ff; flex: 1; }
+    .steps li { margin: 4px 0; }
+    .handoff-qr { text-align: center; position: relative; }
+    .qr-card { background: #fff; border-radius: 12px; padding: 10px; width: 150px; box-shadow: 0 4px 14px rgba(0, 0, 0, .18); }
+    .qr-card svg { display: block; width: 100%; height: auto; }
+    .qr-caption { margin-top: 8px; font-size: 12px; color: #dbe4ff; }
+    .net-pill { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; padding: 4px 10px; border-radius: 999px; border: none; font-size: 11px; font-weight: 600; cursor: pointer; transition: .15s; }
+    .net-pill[hidden] { display: none; }
+    .net-pill.warn { background: #fef3c7; color: #92400e; }
+    .net-pill.warn:hover { background: #fde68a; }
+    .net-pill.ok { background: #d1fae5; color: #065f46; }
+    .net-pill.ok:hover { background: #a7f3d0; }
+    .net-pill.info { background: #dbeafe; color: #1e40af; }
+    .net-pill.info:hover { background: #bfdbfe; }
+    .net-panel { position: absolute; top: 100%; right: 0; z-index: 40; margin-top: 8px; width: max(320px, 100%); max-width: 90vw; background: #1b2340; border: 1px solid rgba(255, 255, 255, .22); border-radius: 10px; padding: 14px 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, .4); text-align: left; }
+    .net-panel[hidden] { display: none; }
+    .net-panel::before { content: ""; position: absolute; top: -6px; right: 20px; width: 10px; height: 10px; background: #1b2340; border-left: 1px solid rgba(255, 255, 255, .22); border-top: 1px solid rgba(255, 255, 255, .22); transform: rotate(45deg); }
+    .net-hint .net-msg { margin: 0 0 8px; color: #fff; font-size: 13px; max-width: none; }
+    .net-hint .net-msg:last-child { margin: 0; }
+    .net-hint a { color: #93c5fd; text-decoration: underline; }
+    .net-hint code { background: rgba(0, 0, 0, .28); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+    .base-form { display: flex; gap: 8px; flex-wrap: wrap; }
+    .base-form input { flex: 1 1 220px; min-width: 0; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, .35); background: rgba(255, 255, 255, .95); color: var(--ink); font: inherit; font-size: 13px; }
+    .base-form .btn { padding: 7px 14px; }
+    .base-help { margin-top: 8px; }
+    .base-help summary { cursor: pointer; color: #dbe4ff; font-size: 12px; }
+    .base-help ul { margin: 6px 0 0; padding-left: 18px; color: #dbe4ff; font-size: 12px; }
+    .base-help li { margin: 4px 0; }
+    .base-help strong { color: #fff; }
+
+    /* buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn:hover { text-decoration: none; border-color: var(--brand); color: var(--brand); }
+        .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+        .btn.primary:hover { background: #2449ad; color: #fff; }
+    .btn.light { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .35); color: #fff; }
+    .btn.light:hover { background: rgba(255, 255, 255, .24); color: #fff; }
+        .btn.ghost { background: transparent; border-color: transparent; color: #cfe0ff; }
+    .btn.ghost:hover { color: #fff; }
+
+    /* toolbar */
+    .toolbar { display: flex; gap: 14px; align-items: center; margin: 22px 0 16px; flex-wrap: wrap; }
+    #search { flex: 1 1 280px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; background: #fff; }
+    #search:focus { outline: 2px solid var(--brand-soft); border-color: var(--brand); }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink-soft); font-size: 13px; font-weight: 600; cursor: pointer; }
+    .chip:hover { border-color: var(--brand); color: var(--brand); }
+        .chip.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+    /* framework tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding: 4px 0 8px;
+      margin: 18px 0 -4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    .tab {
+      flex: none;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tab:hover { border-color: var(--brand); color: var(--brand); }
+    .tab.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+    .tab .tab-count { font-weight: 400; opacity: .7; margin-left: 4px; }
+
+    /* layout */
+    .layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(420px, 2fr); gap: 20px; align-items: start; }
+    .group-title { margin: 18px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+    .group-title .count { color: var(--brand); }
+    .group:first-child .group-title { margin-top: 0; }
+    .items { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+    .sample {
+      text-align: left;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font: inherit;
+      color: inherit;
+      width: 100%;
+    }
+    .sample:hover { border-color: var(--brand); box-shadow: var(--shadow); }
+    .sample.active { border-color: var(--brand); background: var(--brand-soft); box-shadow: inset 4px 0 0 var(--brand); }
+    .sample-title { font-weight: 700; }
+    .sample-desc { font-size: 13px; color: var(--ink-soft); }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+    .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #eef1f7; color: var(--ink-soft); }
+    .tag.nocam { background: #e7f6ec; color: #1c7c3c; }
+    .empty { padding: 30px; text-align: center; color: var(--ink-soft); background: var(--panel); border: 1px dashed var(--line); border-radius: var(--radius); }
+
+    /* detail panel */
+    .detail {
+      position: sticky;
+      top: 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+    }
+    .sheet-close { display: none; }
+    .detail h2 { margin: 0 0 6px; font-size: 22px; line-height: 1.3; }
+    .detail .desc { color: var(--ink-soft); margin: 0 0 14px; font-size: 14px; }
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .qr-section { display: flex; gap: 16px; align-items: center; background: var(--brand-soft); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 20px; }
+    .qr-section .qr-card { width: 140px; flex: none; box-shadow: none; }
+    .qr-side { font-size: 13px; color: var(--ink-soft); min-width: 0; }
+    .qr-side strong { display: block; color: var(--ink); margin-bottom: 3px; font-size: 15px; }
+    .qr-side p { margin: 0 0 8px; }
+    .url { display: block; word-break: break-all; font-size: 11px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; color: var(--ink-soft); }
+    .materials h3 { margin: 0 0 4px; font-size: 16px; }
+    .mat-note { margin: 0 0 10px; font-size: 13px; color: var(--ink-soft); }
+    .mat-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .mat-grid.multi { grid-template-columns: 1fr 1fr; }
+    .preview { padding: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; cursor: zoom-in; display: block; width: 100%; font: inherit; transition: border-color .15s; }
+    .preview:hover { border-color: var(--brand); }
+    .preview img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #fff; }
+    .preview .mat-label { display: block; padding: 6px 8px; font-size: 12px; color: var(--ink-soft); border-top: 1px solid var(--line); text-align: left; }
+    .fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; aspect-ratio: 4 / 3; background: #f0f2f8; border: 1px dashed var(--line); border-radius: 10px; color: var(--ink-soft); font-size: 12px; text-align: center; padding: 8px; }
+    .fallback code { font-size: 11px; }
+
+    /* frameworks */
+    .frameworks { margin-top: 28px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; }
+    .frameworks summary { cursor: pointer; font-weight: 700; }
+    .fw-note { color: var(--ink-soft); font-size: 13px; }
+    .fw-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+    .fw-list a { display: block; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); font-weight: 600; }
+    .fw-list a:hover { border-color: var(--brand); color: var(--brand); text-decoration: none; }
+
+    .foot { margin-top: 30px; color: var(--ink-soft); font-size: 13px; text-align: center; }
+
+    /* backdrop, lightbox, toast, back-to-top */
+    .backdrop { position: fixed; inset: 0; background: rgba(15, 20, 35, .45); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 40; }
+    .backdrop.active { opacity: 1; pointer-events: auto; }
+    .lightbox { position: fixed; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; background: rgba(10, 14, 25, .85); padding: 30px; }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: min(92vw, 1100px); max-height: 82vh; background: #fff; border-radius: 10px; }
+    .lightbox-caption { color: #dbe4ff; font-size: 14px; }
+    .lightbox-close { position: absolute; top: 16px; right: 20px; font-size: 28px; background: none; border: none; color: #fff; cursor: pointer; }
+    .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: #1b1f2a; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: .2s; z-index: 70; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .back-to-top { position: fixed; right: 22px; bottom: 22px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: #fff; color: var(--brand); font-size: 20px; cursor: pointer; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: .2s; z-index: 30; }
+    .back-to-top.show { opacity: 1; pointer-events: auto; }
+
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; }
+      .items { grid-template-columns: 1fr; }
+      .detail { padding: 18px; }
+      .qr-section .qr-card { width: 120px; }
+      .mat-grid, .mat-grid.multi { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 860px) {
+      .wrap { padding: 14px 14px 80px; }
+      .show-mobile { display: block; }
+      .hide-mobile { display: none; }
+      .handoff { padding: 22px; }
+      .steps-row { flex-direction: column; }
+      .steps-row .handoff-qr .qr-card { width: 100px; margin: 0 auto; }
+      .net-panel { right: auto; left: 50%; transform: translateX(-50%); }
+      .layout { grid-template-columns: 1fr; }
+      .detail {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        z-index: 50;
+        max-height: 82vh;
+        border-radius: 16px 16px 0 0;
+        transform: translateY(102%);
+        transition: transform .25s ease;
+      }
+      .detail.open { transform: translateY(0); }
+      .sheet-close { display: block; position: absolute; top: 8px; right: 12px; font-size: 26px; background: none; border: none; color: var(--ink-soft); cursor: pointer; z-index: 1; }
+      .qr-section { display: none; }
+    }
+
+    @media (min-width: 861px) {
+      .backdrop { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a class="brand" href="https://www.dynamsoft.com/" target="_blank" rel="noopener" aria-label="Dynamsoft">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 159 39" xml:space="preserve">
+          <style type="text/css">.st0{fill:#323234;}.st1{fill:#F99D31;}</style>
+          <path class="st0" d="M0,5.3h6.9c4.8,0,7.4,2.6,7.4,8.2v10.8c0,5.6-2.6,8.2-7.4,8.2H0V5.3z M4.7,28.7h1.6c2.5,0,3.4-0.9,3.4-3.8V12.9c0-2.9-0.9-3.8-3.4-3.8H4.7V28.7z"/>
+          <path class="st0" d="M26.6,12.2h4.3L25.6,34c-0.9,3.7-2.6,4.9-5.8,4.9H18v-3.5h1c2.1,0,2.8-1.1,2.8-3.3c0-0.8-0.2-1.7-0.5-2.7L17,12.2h4.3l2.7,13h0.1L26.6,12.2z"/>
+          <path class="st0" d="M33.3,32.5V12.2h4v2c1.8-1.5,2.7-2.4,5.1-2.4c2.2,0,3.5,1.6,3.5,4.3v16.4h-4.2V16.8c0-1-0.6-1.5-1.5-1.5c-0.9,0-1.7,0.6-2.7,1.3v15.9H33.3z"/>
+          <path class="st0" d="M49.6,18.2c0.2-4.1,2.8-6.3,6.8-6.3c3.9,0,6.2,1.8,6.2,5.5v13c0,0.6,0.2,1.5,0.3,2.2h-4c0-0.6-0.2-1.1-0.2-1.6c-1.6,1.3-2.9,2-4.9,2c-2.9,0-4.3-2-4.3-4.6c0-4.5,2.9-6.9,9-9.2v-1.2c0-1.7-0.7-2.6-2.1-2.6c-1.9,0-2.3,1.1-2.4,2.9H49.6z M58.4,22.2c-3.8,2.2-4.8,3.6-4.8,5.4c0,1.3,0.7,1.8,2,1.8c1.2,0,2.1-0.9,2.8-1.9V22.2z"/>
+          <path class="st0" d="M75.3,32.5V16.8c0-1-0.6-1.5-1.5-1.5c-0.9,0-1.7,0.6-2.7,1.3v15.9h-4.2V12.2h4v2c1.8-1.5,2.7-2.4,4.7-2.4c2.1,0,2.8,0.8,3.7,2.4c2-2,3.2-2.4,4.7-2.4c2.6,0,4,1.6,4,4.3v16.4h-4.2V16.8c0-1-0.7-1.5-1.5-1.5c-0.9,0-1.7,0.6-2.7,1.3v15.9H75.3z"/>
+          <g><path class="st0" d="M151.8,27.2h-1v-0.9h3.1v0.9h-1v5.3h-1.1V27.2z"/><path class="st0" d="M158.9,26.3v6.2h-0.9v-4.9h0l-1,4.9h-0.5l-1-4.9h0v4.9h-0.9v-6.2h1.4l0.8,3.6h0l0.8-3.6H158.9z"/></g>
+          <polygon class="st0" points="118.9,0 114,0 116.5,6.3"/>
+          <path class="st1" d="M99.7,17.8c-0.3-1.6-1.1-2.5-2.4-2.5c-1.1,0-1.9,0.6-1.9,1.6c0,3.2,7.9,4.5,7.9,10.5c0,3.6-2.5,5.5-5.9,5.5c-3.7,0-5.8-2.1-6.5-5.7l3.7-1c0.3,1.7,0.9,3.2,2.8,3.2c1.1,0,1.9-0.6,1.9-1.8c0-3.5-7.9-4.8-7.9-10.4c0-3.2,2.5-5.4,5.7-5.4c3.3,0,5.5,2.2,6.2,5.4L99.7,17.8z"/>
+          <path class="st1" d="M130.5,15.7H128v-3.5h2.5V9.7c0-3.3,1.7-4.8,4.7-4.8h2.1v3.5h-1.2c-1,0-1.4,0.4-1.4,1.4v2.5h2.4v3.5h-2.4v16.8h-4.2V15.7z"/>
+          <path class="st1" d="M138.5,15.7v-3.5h2.3V6.7h4.2v5.5h2.8v3.5h-2.8v11.7c0,1.1,0.5,1.7,1.4,1.7h1.4v3.6c-0.6,0.2-1.1,0.2-2.1,0.2c-3.2,0-4.9-1.5-4.9-4.6V15.7H138.5z"/>
+          <g><path class="st1" d="M114.7,15.7v-4.2c-4.7,0.7-8.4,4.5-9,9.2h4.2C110.4,18.2,112.3,16.3,114.7,15.7z"/><path class="st1" d="M123,20.6h4.2c-0.7-4.7-4.4-8.5-9.1-9.2v4.2C120.5,16.2,122.4,18.2,123,20.6z"/><path class="st1" d="M110,24h-4.2c0.8,4.6,4.4,8.2,9,8.9v-4.2C112.4,28.1,110.6,26.3,110,24z"/><path class="st1" d="M118.1,28.7v4.2c4.6-0.7,8.3-4.3,9.1-8.9h-4.2C122.3,26.3,120.4,28.1,118.1,28.7z"/></g>
+        </svg>
+      </a>
+      <nav class="top-links">
+        <a href="https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/" target="_blank" rel="noopener">User Guide</a>
+        <a href="https://github.com/Dynamsoft/barcode-reader-javascript-samples" target="_blank" rel="noopener">GitHub Repo</a>
+        <a href="https://demo.dynamsoft.com/barcode-reader-js/" target="_blank" rel="noopener">Official Demo</a>
+      </nav>
+    </header>
+
+    <section class="handoff">
+      <div class="handoff-text">
+        <h1 id="handoffTitle">📱 Scan with your phone, keep this page on your desktop</h1>
+        <p id="handoffDesc">Barcode scanning works best with a phone camera. Send any sample to your phone in seconds, then use the barcode images on this screen as scan targets.</p>
+        <div class="steps-row">
+          <ol class="steps">
+            <li>Scan this page's QR code to open it on your phone, or use the QR code shown with any sample to open it directly.</li>
+            <li>Try the sample on your phone.</li>
+            <li>Point your phone at the barcode images on this screen to test scanning.</li>
+          </ol>
+          <div class="handoff-qr">
+            <div class="qr-card" id="pageQr"></div>
+            <div class="qr-caption">Scan to open on your phone</div>
+            <button class="net-pill" id="netPill" type="button" hidden></button>
+            <div class="net-panel" id="netPanel" hidden>
+              <div class="net-hint" id="netHint"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tabs" id="tabs" aria-label="Framework"></nav>
+
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search samples… (e.g. QR, inventory, VIN)" aria-label="Search samples">
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <main class="layout">
+      <section class="list" id="list" aria-label="Sample list"></section>
+      <aside class="detail" id="detail" aria-label="Sample detail">
+        <button class="sheet-close" id="sheetClose" type="button" aria-label="Close">×</button>
+        <div class="detail-content" id="detailContent"></div>
+      </aside>
+    </main>
+
+    <footer class="foot">
+      <p>Dynamsoft Barcode Reader SDK for JavaScript ·
+        <a href="https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/" target="_blank" rel="noopener">Documentation</a> ·
+        <a href="https://github.com/Dynamsoft/barcode-reader-javascript-samples" target="_blank" rel="noopener">GitHub</a>
+      </p>
+    </footer>
+  </div>
+
+  <div class="backdrop" id="backdrop"></div>
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Scan material preview">
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close">×</button>
+    <img id="lightboxImg" alt="Scan material">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+  <button id="backToTop" class="back-to-top" title="Back to top" aria-label="Back to top">↑</button>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+/* Minimal QR Code generator: byte mode, ECC level M, versions 1-10, auto mask. */
+(function (root) {
+  "use strict";
+
+  // [ecCodewordsPerBlock, group1Blocks, group1DataCodewords, group2Blocks, group2DataCodewords]
+  var ECC_M = {
+    1: [10, 1, 16, 0, 0],
+    2: [16, 1, 28, 0, 0],
+    3: [26, 1, 44, 0, 0],
+    4: [18, 2, 32, 0, 0],
+    5: [24, 2, 43, 0, 0],
+    6: [16, 4, 27, 0, 0],
+    7: [18, 4, 31, 0, 0],
+    8: [22, 2, 38, 2, 39],
+    9: [22, 3, 36, 2, 37],
+    10: [26, 4, 43, 1, 44],
+  };
+
+  var ALIGN = {
+    1: [],
+    2: [6, 18],
+    3: [6, 22],
+    4: [6, 26],
+    5: [6, 30],
+    6: [6, 34],
+    7: [6, 22, 38],
+    8: [6, 24, 42],
+    9: [6, 26, 46],
+    10: [6, 28, 50],
+  };
+
+  // GF(256) tables, primitive polynomial 0x11D
+  var EXP = new Uint8Array(512);
+  var LOG = new Uint8Array(256);
+  (function () {
+    var x = 1;
+    for (var i = 0; i < 255; i++) {
+      EXP[i] = x;
+      LOG[x] = i;
+      x <<= 1;
+      if (x & 0x100) x ^= 0x11d;
+    }
+    for (var j = 255; j < 512; j++) EXP[j] = EXP[j - 255];
+  })();
+
+  function gfMul(a, b) {
+    if (a === 0 || b === 0) return 0;
+    return EXP[LOG[a] + LOG[b]];
+  }
+
+  function rsGeneratorPoly(degree) {
+    var poly = [1];
+    for (var i = 0; i < degree; i++) {
+      var next = new Array(poly.length + 1).fill(0);
+      for (var j = 0; j < poly.length; j++) {
+        next[j] ^= poly[j];
+        next[j + 1] ^= gfMul(poly[j], EXP[i]);
+      }
+      poly = next;
+    }
+    return poly;
+  }
+
+  function rsEncode(data, ecLen) {
+    var gen = rsGeneratorPoly(ecLen);
+    var res = new Array(ecLen).fill(0);
+    for (var i = 0; i < data.length; i++) {
+      var factor = data[i] ^ res[0];
+      res.shift();
+      res.push(0);
+      for (var j = 0; j < ecLen; j++) res[j] ^= gfMul(gen[j + 1], factor);
+    }
+    return res;
+  }
+
+  function utf8Bytes(str) {
+    var out = [];
+    for (var i = 0; i < str.length; i++) {
+      var c = str.charCodeAt(i);
+      if (c < 0x80) out.push(c);
+      else if (c < 0x800) {
+        out.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f));
+      } else if (c >= 0xd800 && c <= 0xdbff && i + 1 < str.length) {
+        var c2 = str.charCodeAt(++i);
+        var cp = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
+        out.push(0xf0 | (cp >> 18), 0x80 | ((cp >> 12) & 0x3f), 0x80 | ((cp >> 6) & 0x3f), 0x80 | (cp & 0x3f));
+      } else {
+        out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f));
+      }
+    }
+    return out;
+  }
+
+  function bchFormat(data) {
+    var d = data << 10;
+    for (var i = 14; i >= 10; i--) {
+      if (d & (1 << i)) d ^= 0x537 << (i - 10);
+    }
+    return ((data << 10) | d) ^ 0x5412;
+  }
+
+  function bchVersion(version) {
+    var d = version << 12;
+    for (var i = 17; i >= 12; i--) {
+      if (d & (1 << i)) d ^= 0x1f25 << (i - 12);
+    }
+    return (version << 12) | d;
+  }
+
+  function buildCodewords(bytes, version) {
+    var spec = ECC_M[version];
+    var ecLen = spec[0];
+    var totalData = spec[1] * spec[2] + spec[3] * spec[4];
+
+    var bits = [];
+    function push(value, len) {
+      for (var i = len - 1; i >= 0; i--) bits.push((value >> i) & 1);
+    }
+    push(0x4, 4); // byte mode
+    push(bytes.length, version < 10 ? 8 : 16);
+    for (var i = 0; i < bytes.length; i++) push(bytes[i], 8);
+
+    var capacityBits = totalData * 8;
+    var terminator = Math.min(4, capacityBits - bits.length);
+    push(0, terminator);
+    while (bits.length % 8 !== 0) bits.push(0);
+
+    var data = [];
+    for (var b = 0; b < bits.length; b += 8) {
+      var v = 0;
+      for (var k = 0; k < 8; k++) v = (v << 1) | bits[b + k];
+      data.push(v);
+    }
+    var padBytes = [0xec, 0x11];
+    var p = 0;
+    while (data.length < totalData) data.push(padBytes[p++ % 2]);
+
+    // split into blocks
+    var blocks = [];
+    var ecBlocks = [];
+    var offset = 0;
+    var groups = [
+      [spec[1], spec[2]],
+      [spec[3], spec[4]],
+    ];
+    for (var g = 0; g < groups.length; g++) {
+      for (var n = 0; n < groups[g][0]; n++) {
+        var block = data.slice(offset, offset + groups[g][1]);
+        offset += groups[g][1];
+        blocks.push(block);
+        ecBlocks.push(rsEncode(block, ecLen));
+      }
+    }
+
+    var result = [];
+    var maxData = Math.max(spec[2], spec[4]);
+    for (var c = 0; c < maxData; c++) {
+      for (var bi = 0; bi < blocks.length; bi++) {
+        if (c < blocks[bi].length) result.push(blocks[bi][c]);
+      }
+    }
+    for (var e = 0; e < ecLen; e++) {
+      for (var bj = 0; bj < ecBlocks.length; bj++) result.push(ecBlocks[bj][e]);
+    }
+    return result;
+  }
+
+  function createMatrix(version) {
+    var size = version * 4 + 17;
+    var modules = [];
+    var reserved = [];
+    for (var i = 0; i < size; i++) {
+      modules.push(new Array(size).fill(0));
+      reserved.push(new Array(size).fill(false));
+    }
+
+    function setFinder(row, col) {
+      for (var r = -1; r <= 7; r++) {
+        for (var c = -1; c <= 7; c++) {
+          var rr = row + r;
+          var cc = col + c;
+          if (rr < 0 || rr >= size || cc < 0 || cc >= size) continue;
+          var isDark = r >= 0 && r <= 6 && c >= 0 && c <= 6 && (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4));
+          modules[rr][cc] = isDark ? 1 : 0;
+          reserved[rr][cc] = true;
+        }
+      }
+    }
+    setFinder(0, 0);
+    setFinder(0, size - 7);
+    setFinder(size - 7, 0);
+
+    // timing patterns
+    for (var t = 8; t < size - 8; t++) {
+      var dark = t % 2 === 0 ? 1 : 0;
+      modules[6][t] = dark;
+      reserved[6][t] = true;
+      modules[t][6] = dark;
+      reserved[t][6] = true;
+    }
+
+    // alignment patterns
+    var centers = ALIGN[version];
+    var last = centers.length - 1;
+    for (var a = 0; a < centers.length; a++) {
+      for (var b = 0; b < centers.length; b++) {
+        // skip the three positions that overlap the finder patterns
+        if ((a === 0 && b === 0) || (a === 0 && b === last) || (a === last && b === 0)) continue;
+        var cr = centers[a];
+        var cc2 = centers[b];
+        for (var dr = -2; dr <= 2; dr++) {
+          for (var dc = -2; dc <= 2; dc++) {
+            modules[cr + dr][cc2 + dc] = Math.max(Math.abs(dr), Math.abs(dc)) !== 1 ? 1 : 0;
+            reserved[cr + dr][cc2 + dc] = true;
+          }
+        }
+      }
+    }
+
+    // dark module
+    modules[size - 8][8] = 1;
+    reserved[size - 8][8] = true;
+
+    // reserve format info areas
+    for (var f = 0; f < 9; f++) {
+      if (!reserved[8][f]) reserved[8][f] = true;
+      if (!reserved[f][8]) reserved[f][8] = true;
+    }
+    for (var f2 = 0; f2 < 8; f2++) {
+      reserved[8][size - 1 - f2] = true;
+      reserved[size - 1 - f2][8] = true;
+    }
+
+    // reserve version info areas
+    if (version >= 7) {
+      for (var vi = 0; vi < 6; vi++) {
+        for (var vj = 0; vj < 3; vj++) {
+          reserved[size - 11 + vj][vi] = true;
+          reserved[vi][size - 11 + vj] = true;
+        }
+      }
+    }
+
+    return { size: size, modules: modules, reserved: reserved };
+  }
+
+  function placeData(m, codewords) {
+    var size = m.size;
+    var bitIndex = 0;
+    var total = codewords.length * 8;
+    function nextBit() {
+      if (bitIndex >= total) return 0;
+      var b = (codewords[bitIndex >> 3] >> (7 - (bitIndex & 7))) & 1;
+      bitIndex++;
+      return b;
+    }
+    var upward = true;
+    for (var col = size - 1; col > 0; col -= 2) {
+      if (col === 6) col--;
+      for (var i = 0; i < size; i++) {
+        var row = upward ? size - 1 - i : i;
+        for (var c = 0; c < 2; c++) {
+          var cc = col - c;
+          if (m.reserved[row][cc]) continue;
+          m.modules[row][cc] = nextBit();
+        }
+      }
+      upward = !upward;
+    }
+  }
+
+  function maskFn(id, r, c) {
+    switch (id) {
+      case 0:
+        return (r + c) % 2 === 0;
+      case 1:
+        return r % 2 === 0;
+      case 2:
+        return c % 3 === 0;
+      case 3:
+        return (r + c) % 3 === 0;
+      case 4:
+        return (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0;
+      case 5:
+        return ((r * c) % 2) + ((r * c) % 3) === 0;
+      case 6:
+        return (((r * c) % 2) + ((r * c) % 3)) % 2 === 0;
+      default:
+        return (((r + c) % 2) + ((r * c) % 3)) % 2 === 0;
+    }
+  }
+
+  function applyMask(base, id) {
+    var size = base.size;
+    var out = [];
+    for (var r = 0; r < size; r++) {
+      out.push(base.modules[r].slice());
+      for (var c = 0; c < size; c++) {
+        if (!base.reserved[r][c] && maskFn(id, r, c)) out[r][c] ^= 1;
+      }
+    }
+    return out;
+  }
+
+  function drawFormat(modules, size, maskId) {
+    var bits = bchFormat((0x0 << 3) | maskId); // ECC level M -> 00
+    for (var i = 0; i < 15; i++) {
+      var bit = (bits >> i) & 1;
+      // top-left copy
+      if (i < 6) modules[i][8] = bit;
+      else if (i === 6) modules[7][8] = bit;
+      else if (i === 7) modules[8][8] = bit;
+      else if (i === 8) modules[8][7] = bit;
+      else modules[8][14 - i] = bit;
+      // second copy
+      if (i < 8) modules[8][size - 1 - i] = bit;
+      else modules[size - 15 + i][8] = bit;
+    }
+    modules[size - 8][8] = 1;
+  }
+
+  function drawVersion(modules, size, version) {
+    if (version < 7) return;
+    var bits = bchVersion(version);
+    for (var i = 0; i < 18; i++) {
+      var bit = (bits >> i) & 1;
+      var r = Math.floor(i / 3);
+      var c = size - 11 + (i % 3);
+      modules[r][c] = bit;
+      modules[c][r] = bit;
+    }
+  }
+
+  function penalty(modules, size) {
+    var score = 0;
+    var dark = 0;
+    // rule 1 & 3 horizontal + vertical
+    function runScore(line) {
+      var s = 0;
+      var run = 1;
+      for (var i = 1; i < line.length; i++) {
+        if (line[i] === line[i - 1]) run++;
+        else {
+          if (run >= 5) s += 3 + (run - 5);
+          run = 1;
+        }
+      }
+      if (run >= 5) s += 3 + (run - 5);
+      return s;
+    }
+    var patternA = [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0];
+    var patternB = [0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1];
+    function finderScore(line) {
+      var s = 0;
+      for (var i = 0; i + 11 <= line.length; i++) {
+        var a = true;
+        var b = true;
+        for (var j = 0; j < 11; j++) {
+          if (line[i + j] !== patternA[j]) a = false;
+          if (line[i + j] !== patternB[j]) b = false;
+        }
+        if (a) s += 40;
+        if (b) s += 40;
+      }
+      return s;
+    }
+    for (var r = 0; r < size; r++) {
+      var row = modules[r];
+      score += runScore(row) + finderScore(row);
+      for (var c = 0; c < size; c++) if (row[c]) dark++;
+    }
+    for (var c2 = 0; c2 < size; c2++) {
+      var col = [];
+      for (var r2 = 0; r2 < size; r2++) col.push(modules[r2][c2]);
+      score += runScore(col) + finderScore(col);
+    }
+    // rule 2: 2x2 blocks
+    for (var r3 = 0; r3 < size - 1; r3++) {
+      for (var c3 = 0; c3 < size - 1; c3++) {
+        var v = modules[r3][c3];
+        if (v === modules[r3][c3 + 1] && v === modules[r3 + 1][c3] && v === modules[r3 + 1][c3 + 1]) score += 3;
+      }
+    }
+    // rule 4: dark ratio
+    var ratio = (dark * 100) / (size * size);
+    score += Math.floor(Math.abs(ratio - 50) / 5) * 10;
+    return score;
+  }
+
+  function encode(text) {
+    var bytes = utf8Bytes(text);
+    var version = 0;
+    for (var v = 1; v <= 10; v++) {
+      var spec = ECC_M[v];
+      var capacity = spec[1] * spec[2] + spec[3] * spec[4];
+      var headerBits = 4 + (v < 10 ? 8 : 16);
+      if (headerBits + bytes.length * 8 <= capacity * 8) {
+        version = v;
+        break;
+      }
+    }
+    if (!version) throw new Error("Text too long for QR version 10 (ECC M).");
+
+    var codewords = buildCodewords(bytes, version);
+    var base = createMatrix(version);
+    placeData(base, codewords);
+
+    var best = null;
+    var bestScore = Infinity;
+    for (var mask = 0; mask < 8; mask++) {
+      var modules = applyMask(base, mask);
+      drawFormat(modules, base.size, mask);
+      drawVersion(modules, base.size, version);
+      var s = penalty(modules, base.size);
+      if (s < bestScore) {
+        bestScore = s;
+        best = modules;
+      }
+    }
+    return { size: base.size, modules: best, version: version };
+  }
+
+  function toSvg(text, options) {
+    var opts = options || {};
+    var quiet = opts.quiet == null ? 2 : opts.quiet;
+    var qr = encode(text);
+    var dim = qr.size + quiet * 2;
+    var path = "";
+    for (var r = 0; r < qr.size; r++) {
+      for (var c = 0; c < qr.size; c++) {
+        if (qr.modules[r][c]) path += "M" + (c + quiet) + " " + (r + quiet) + "h1v1h-1z";
+      }
+    }
+    return (
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' +
+      dim +
+      " " +
+      dim +
+      '" shape-rendering="crispEdges" role="img" aria-label="QR code">' +
+      '<rect width="' +
+      dim +
+      '" height="' +
+      dim +
+      '" fill="#ffffff"/><path d="' +
+      path +
+      '" fill="#111111"/></svg>'
+    );
+  }
+
+  root.MiniQR = { encode: encode, toSvg: toSvg };
+})(typeof window !== "undefined" ? window : globalThis);
+
+(function () {
+  "use strict";
+
+  var REPO = "https://github.com/Dynamsoft/barcode-reader-javascript-samples";
+  var FALLBACK_BASE = "https://demo.dynamsoft.com/Samples/DBR/JS/";
+  var MATERIAL_DIR = "assets/materials/";
+
+  var IS_FILE = location.protocol === "file:";
+  var IS_LOOPBACK = /^(localhost|127(\.\d+){3}|\[?::1\]?|0\.0\.0\.0)$/i.test(location.hostname);
+
+  var IS_INSECURE_REMOTE = !IS_FILE && !IS_LOOPBACK && location.protocol === "http:";
+  var BASE_KEY = "dbrjs-samples.phoneBase";
+
+  function readPhoneBase() {
+    try { return localStorage.getItem(BASE_KEY) || ""; } catch (e) { return ""; }
+  }
+
+  function writePhoneBase(v) {
+    try { v ? localStorage.setItem(BASE_KEY, v) : localStorage.removeItem(BASE_KEY); } catch (e) { /* private mode */ }
+  }
+
+  // Accepts "192.168.1.20:5500", "https://abc.trycloudflare.com" or a full URL.
+  // A bare origin reuses this page's path, since tunnels and LAN servers mirror it.
+  function normalizeBase(input) {
+    var v = (input || "").trim();
+    if (!v) return "";
+    if (!/^https?:\/\//i.test(v)) v = "https://" + v;
+    var u;
+    try { u = new URL(v); } catch (e) { return null; }
+    var path = u.pathname === "/" ? location.pathname : u.pathname;
+    if (!/\/$/.test(path) && !/\.html?$/i.test(path)) path += "/";
+    return u.origin + path;
+  }
+
+  var phoneBase = "";
+  if (IS_LOOPBACK || IS_INSECURE_REMOTE) {
+    // ?phone=<address> presets the phone address (handy for docs/scripts).
+    var qp = new URLSearchParams(location.search).get("phone");
+    var fromQuery = qp !== null ? normalizeBase(qp) : null;
+    if (fromQuery !== null) writePhoneBase(fromQuery);
+    phoneBase = fromQuery !== null ? fromQuery : readPhoneBase();
+  }
+
+  // Sample links follow the prefix of this index page, so a self-hosted copy
+  // (Five Server, tunnel, LAN) points phones at itself. Only file:// falls back
+  // to the hosted demo; a user-supplied phone address overrides loopback/http.
+  function absoluteUrl(path) {
+    if (IS_FILE) return FALLBACK_BASE + path;
+    var base = phoneBase || (location.origin + location.pathname);
+    return path ? new URL(path, base).href : base;
+  }
+
+  function renderNetHint() {
+    var pill = document.getElementById("netPill");
+    var panel = document.getElementById("netPanel");
+    var el = document.getElementById("netHint");
+
+    if (IS_FILE) {
+      pill.className = "net-pill info";
+      pill.textContent = "ℹ️ File system";
+      pill.hidden = false;
+      el.innerHTML = '<p class="net-msg">Opened via <code>file://</code>, so QR codes link to the ' +
+        '<a href="' + FALLBACK_BASE + '" target="_blank" rel="noopener">hosted demo</a>. ' +
+        "Serve this folder locally to use your own copy.</p>";
+      return;
+    }
+    if (!IS_LOOPBACK && !IS_INSECURE_REMOTE) {
+      if (phoneBase) {
+        pill.className = "net-pill ok";
+        pill.textContent = "✅ " + phoneBase.replace(/^https?:\/\//, "").split("/")[0];
+        pill.hidden = false;
+        el.innerHTML = '<p class="net-msg">QR codes → <strong>' + esc(phoneBase) + '</strong></p>' +
+          renderBaseForm();
+        bindBaseForm();
+      } else {
+        pill.hidden = true;
+        panel.hidden = true;
+      }
+      return;
+    }
+
+    var pillText, pillClass, status;
+    if (phoneBase) {
+      pillClass = "ok";
+      pillText = "✅ " + phoneBase.replace(/^https?:\/\//, "").split("/")[0];
+      status = "QR codes → <strong>" + esc(phoneBase) + "</strong>";
+    } else if (IS_LOOPBACK) {
+      pillClass = "warn";
+      pillText = "⚠️ localhost";
+      status = "This page is hosted at <strong>" + esc(location.host) + "</strong>, which your phone can't reach.";
+    } else {
+      pillClass = "warn";
+      pillText = "⚠️ No HTTPS";
+      status = "Served over plain HTTP. Camera access requires HTTPS, so scanning won't work on your phone.";
+    }
+
+    pill.className = "net-pill " + pillClass;
+    pill.textContent = pillText;
+    pill.hidden = false;
+
+    el.innerHTML = '<p class="net-msg">' + status + "</p>" +
+      '<details class="base-help"><summary>Why HTTPS?</summary>' +
+      '<p class="net-msg" style="margin:6px 0 8px">The camera API (<code>getUserMedia</code>) only works in ' +
+      "<strong>secure contexts</strong>. Without HTTPS, the browser blocks camera access entirely. " +
+      '<code>localhost</code> is exempt but unreachable from your phone.</p><ul>' +
+      "<li><strong>Same Wi-Fi</strong>: serve on <code>0.0.0.0</code> with HTTPS enabled, " +
+      "find your LAN IP (<code>ipconfig</code> / <code>ifconfig</code>), " +
+      "open <code>https://192.168.x.x:&lt;port&gt;</code> on the phone.</li>" +
+      "<li><strong>ngrok / Cloudflare tunnel</strong>: " +
+      "<code>ngrok http 5500</code> or <code>cloudflared tunnel --url http://localhost:5500</code>. " +
+      "Gives you a public HTTPS URL instantly.</li>" +
+      "</ul></details>" +
+      '<p class="net-msg" style="margin:8px 0 4px">Once you have an HTTPS address, paste it here:</p>' + renderBaseForm();
+    bindBaseForm();
+  }
+
+  function renderBaseForm() {
+    return '<form class="base-form" id="baseForm" autocomplete="off">' +
+      '<input id="baseInput" type="text" spellcheck="false" aria-label="Phone-accessible address" ' +
+      'placeholder="https://xxxx.trycloudflare.com  or  https://192.168.x.x:5500" value="' + esc(phoneBase) + '">' +
+      '<button class="btn light" type="submit">Update all QR codes</button>' +
+      (phoneBase ? '<button class="btn ghost" type="button" id="baseReset">Reset</button>' : "") +
+      "</form>";
+  }
+
+  function bindBaseForm() {
+    var form = document.getElementById("baseForm");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var v = normalizeBase(document.getElementById("baseInput").value);
+      if (v === null) { toast("That doesn't look like a valid address"); return; }
+      applyPhoneBase(v);
+      toast(v ? "QR codes updated" : "Phone address cleared");
+    });
+    var reset = document.getElementById("baseReset");
+    if (reset) reset.addEventListener("click", function () { applyPhoneBase(""); toast("Phone address cleared"); });
+  }
+
+  function applyPhoneBase(v) {
+    phoneBase = v;
+    writePhoneBase(v);
+    renderPageQr();
+    renderNetHint();
+    if (state.selected && !isPhoneLayout()) selectSample(state.selected);
+  }
+
+  function renderPageQr() {
+    document.getElementById("pageQr").innerHTML = MiniQR.toSvg(absoluteUrl(""));
+  }
+
+  var MATERIALS = {
+    "mixed-codes": { file: "mixed-codes.png", label: "Assorted 1D & 2D barcode symbologies" },
+    "read-an-image": { file: "read-an-image.png", label: "Grid of UPC / EAN / QR / DataMatrix items" },
+    "qr": { file: "qr.png", label: "A single QR code" },
+    "single-1D-1": { file: "single-1D-1.png", label: "EAN-13 on a cereal box" },
+    "single-1D-2": { file: "single-1D-2.png", label: "UPC-A on a curved pouch" },
+    "single-1D-3": { file: "single-1D-3.png", label: "EAN-13 on a crinkled snack bag" },
+    "single-1D-4": { file: "single-1D-4.png", label: "EAN-13 on a product on a shelf" },
+    "cart-builder": { file: "cart-builder.png", label: "Retail products with 1D barcodes" },
+    "locate-item": { file: "locate-an-item-with-barcode.png", label: "Multiple items with barcodes to locate one" },
+    "batch-inventory": { file: "batch-inventory.png", label: "Inventory items with barcodes" },
+    "show-result-texts": { file: "show-result-texts-on-the-video.png", label: "Multiple barcodes for on-video result overlay" },
+    "form-codes": { file: "form-codes.png", label: "Component box label with several barcodes" },
+    "common2D": { file: "common2D.png", label: "Common 2D codes: QR, DataMatrix, PDF417, Aztec" },
+    "oneDRetail": { file: "oneDRetail.png", label: "Retail 1D barcodes: EAN / UPC" },
+    "oneDIndustrial": { file: "oneDIndustrial.png", label: "Industrial 1D barcodes: Code 39 / Code 128 / ITF" },
+    "datamatrix-grid": { file: "datamatrix-grid.png", label: "Rack of tubes with DataMatrix codes" },
+    "dpm-parts": { file: "dpm-parts.png", label: "Dot-peened DPM DataMatrix on metal" },
+    "drivers-license": { file: "drivers-license-pdf417.png", label: "Driver's license PDF417 (AAMVA sample)" },
+    "vin-code": { file: "vin-code.png", label: "VIN barcode on a vehicle door label" },
+    "gs1-codes": { file: "gs1-codes.png", label: "GS1-128 barcode on a food label" },
+    "datamatrix": { file: "datamatrix.png", label: "DataMatrix on a hard drive label" }
+  };
+  var GROUPS = [
+    { id: "basics", label: "Hello World" },
+    { id: "workflow", label: "Workflow Examples" },
+    { id: "barcode-type", label: "Barcode Type Focused" },
+    { id: "parsing", label: "Data Parsing" }
+  ];
+
+  function src(path) { return REPO + "/blob/main/" + path; }
+  function srcDir(path) { return REPO + "/tree/main/" + path; }
+
+  var FRAMEWORKS = [
+    { id: "vanilla", name: "Vanilla JS", sourceOnly: false, samples: [
+      { id: "hello-world", title: "Hello World (Scan Multiple Barcodes)", group: "basics", path: "basics/hello-world.html", source: src("basics/hello-world.html"),
+        desc: "The simplest way to get started: open the camera and scan multiple barcodes with default settings.",
+        tags: ["camera", "getting started"], materials: ["mixed-codes"] },
+      { id: "scan-a-single-barcode", title: "Scan a Single Barcode", group: "basics", path: "basics/scan-a-single-barcode.html", source: src("basics/scan-a-single-barcode.html"),
+        desc: "Scan exactly one barcode and return immediately. Ideal for simple scan-and-go flows.",
+        tags: ["camera", "single"], materials: ["single-1D-1", "single-1D-2", "single-1D-3", "single-1D-4"] },
+      { id: "read-an-image", title: "Read an Image", group: "basics", path: "basics/read-an-image.html", source: src("basics/read-an-image.html"),
+        desc: "Decode barcodes from a local image file instead of the camera. Works great on desktop. Download a material image below and feed it to the sample.",
+        tags: ["image", "file"], noCamera: true, materials: ["read-an-image"] },
+
+      { id: "cart-builder", title: "Cart Builder", group: "workflow", path: "scenarios/cart-builder/index.html", source: srcDir("scenarios/cart-builder"),
+        desc: "Scan product barcodes to build a shopping cart with quantities and a running total.",
+        tags: ["cart", "retail", "checkout"], materials: ["cart-builder"] },
+      { id: "scan-and-search", title: "Scan and Search", group: "workflow", path: "scenarios/scan-and-search/index.html", source: srcDir("scenarios/scan-and-search"),
+        desc: "Scan a barcode and look it up in a dataset. The classic inventory / price-check flow.",
+        tags: ["search", "inventory", "lookup"], materials: ["single-1D-1", "single-1D-2", "single-1D-3", "single-1D-4"] },
+      { id: "tip-and-beep", title: "Tip Message & Beep", group: "workflow", path: "scenarios/tip-and-beep/index.html", source: srcDir("scenarios/tip-and-beep"),
+        desc: "Give users feedback with a sound and a toast message whenever a barcode is decoded.",
+        tags: ["feedback", "sound", "ux"], materials: ["read-an-image"] },
+      { id: "pick-one-to-fill", title: "Pick One to Fill", group: "workflow", path: "scenarios/pick-one-to-fill/index.html", source: srcDir("scenarios/pick-one-to-fill"),
+        desc: "Pick a target input field, then scan a barcode to fill it in. Handy for web forms.",
+        tags: ["form", "input", "fill"], materials: ["form-codes"] },
+      { id: "batch-inventory", title: "Batch Inventory", group: "workflow", path: "scenarios/batch-inventory/index.html", source: srcDir("scenarios/batch-inventory"),
+        desc: "Continuously scan many items and keep a running inventory list with counts.",
+        tags: ["inventory", "batch", "count"], materials: ["batch-inventory"] },
+      { id: "locate-an-item-with-barcode", title: "Locate an Item with Barcode", group: "workflow", path: "scenarios/locate-an-item-with-barcode/index.html", source: srcDir("scenarios/locate-an-item-with-barcode"),
+        desc: "Highlight the one item you are looking for among the many barcodes in view.",
+        tags: ["locate", "highlight", "ar"], materials: ["locate-item"] },
+      { id: "show-result-texts-on-the-video", title: "Show Result Texts on Video", group: "workflow", path: "scenarios/show-result-texts-on-the-video/index.html", source: srcDir("scenarios/show-result-texts-on-the-video"),
+        desc: "Overlay the decoded text directly on the video feed next to each barcode.",
+        tags: ["overlay", "video", "ar"], materials: ["show-result-texts"] },
+
+      { id: "scan-qr-code", title: "Scan QR Code", group: "barcode-type", path: "scenarios/scan-qr-code/index.html", source: srcDir("scenarios/scan-qr-code"),
+        desc: "Tune the runtime settings to read QR codes only. Faster and more accurate when you know the symbology.",
+        tags: ["qr", "2d"], materials: ["qr"] },
+      { id: "scan-datamatrix-code", title: "Scan DataMatrix Code", group: "barcode-type", path: "scenarios/scan-datamatrix-code/index.html", source: srcDir("scenarios/scan-datamatrix-code"),
+        desc: "Tune the runtime settings to read DataMatrix codes only.",
+        tags: ["datamatrix", "2d"], materials: ["datamatrix"] },
+      { id: "scan-dpm-codes", title: "Scan DPM Codes", group: "barcode-type", path: "scenarios/scan-dpm-codes/index.html", source: srcDir("scenarios/scan-dpm-codes"),
+        desc: "Read Direct Part Marking codes: barcodes etched or dotted directly onto metal parts.",
+        tags: ["dpm", "datamatrix", "industrial"], materials: ["dpm-parts"] },
+      { id: "scan-common-2D-codes", title: "Scan Common 2D Codes", group: "barcode-type", path: "scenarios/scan-common-2D-codes/index.html", source: srcDir("scenarios/scan-common-2D-codes"),
+        desc: "Read the most common 2D symbologies: QR, DataMatrix, PDF417 and Aztec.",
+        tags: ["2d", "qr", "datamatrix", "pdf417", "aztec"], materials: ["common2D"] },
+      { id: "scan-1D-Retail", title: "Scan 1D Retail Barcodes", group: "barcode-type", path: "scenarios/scan-1D-Retail/index.html", source: srcDir("scenarios/scan-1D-Retail"),
+        desc: "Read retail 1D barcodes such as EAN-13, EAN-8, UPC-A and UPC-E.",
+        tags: ["1d", "retail", "ean", "upc"], materials: ["oneDRetail"] },
+      { id: "scan-1D-Industrial", title: "Scan 1D Industrial Barcodes", group: "barcode-type", path: "scenarios/scan-1D-Industrial/index.html", source: srcDir("scenarios/scan-1D-Industrial"),
+        desc: "Read industrial 1D barcodes such as Code 39, Code 93, Code 128 and ITF.",
+        tags: ["1d", "industrial", "code39", "code128"], materials: ["oneDIndustrial"] },
+      { id: "scan-common-1D-and-2D", title: "Scan Any Codes", group: "barcode-type", path: "scenarios/scan-common-1D-and-2D/index.html", source: srcDir("scenarios/scan-common-1D-and-2D"),
+        desc: "Enable all common 1D and 2D symbologies at once and scan whatever you point at.",
+        tags: ["1d", "2d", "all"], materials: ["mixed-codes"] },
+      { id: "scan-from-distance", title: "Scan from Distance", group: "barcode-type", path: "scenarios/scan-from-distance/index.html", source: srcDir("scenarios/scan-from-distance"),
+        desc: "Scan small or far-away barcodes by combining resolution, zoom and focus settings.",
+        tags: ["distance", "zoom", "small"], materials: ["read-an-image"] },
+      { id: "grid-barcode-reading", title: "Grid Barcode Reading", group: "barcode-type", path: "scenarios/grid-barcode-reading/index.html", source: srcDir("scenarios/grid-barcode-reading"),
+        desc: "Read dozens of barcodes arranged in a grid from a single image. No camera required.",
+        tags: ["grid", "batch", "image"], noCamera: true, materials: ["datamatrix-grid"] },
+
+      { id: "read-a-drivers-license", title: "Read a Driver's License", group: "parsing", path: "scenarios/read-a-drivers-license/index.html", source: srcDir("scenarios/read-a-drivers-license"),
+        desc: "Scan the PDF417 on a driver's license and parse the AAMVA data into readable fields.",
+        tags: ["pdf417", "aamva", "license", "parse"], materials: ["drivers-license"] },
+      { id: "read-vin", title: "Read VIN", group: "parsing", path: "scenarios/read-vin/index.html", source: srcDir("scenarios/read-vin"),
+        desc: "Scan a vehicle identification number barcode and parse it into structured fields.",
+        tags: ["vin", "vehicle", "parse"], materials: ["vin-code"] },
+      { id: "read-and-parse-GS1-AI", title: "Read and Parse GS1-AI", group: "parsing", path: "scenarios/read-and-parse-GS1-AI/index.html", source: srcDir("scenarios/read-and-parse-GS1-AI"),
+        desc: "Read GS1 barcodes and parse the application identifiers (GTIN, expiry, batch, …).",
+        tags: ["gs1", "ai", "parse", "retail"], materials: ["gs1-codes"] }
+    ]},
+    { id: "react", name: "React", sourceOnly: true, samples: [
+      { id: "react-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/react"),
+        desc: "React integration with video and image capture components for barcode scanning.",
+        tags: ["camera","getting started"], materials: ["mixed-codes"] }
+    ]},
+    { id: "vue", name: "Vue", sourceOnly: true, samples: [
+      { id: "vue-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/vue"),
+        desc: "Vue integration with video and image capture components for barcode scanning.",
+        tags: ["camera","getting started"], materials: ["mixed-codes"] }
+    ]},
+    { id: "angular", name: "Angular", sourceOnly: true, samples: [
+      { id: "angular-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/angular"),
+        desc: "Angular integration with video and image capture components for barcode scanning.",
+        tags: ["camera","getting started"], materials: ["mixed-codes"] }
+    ]},
+    { id: "next", name: "Next.js", sourceOnly: true, samples: [
+      { id: "next-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/next"),
+        desc: "Next.js integration with video and image capture components for barcode scanning.",
+        tags: ["camera","getting started"], materials: ["mixed-codes"] }
+    ]},
+    { id: "nuxt", name: "Nuxt", sourceOnly: true, samples: [
+      { id: "nuxt-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/nuxt"),
+        desc: "Nuxt integration with video and image capture components for barcode scanning.",
+        tags: ["camera","getting started"], materials: ["mixed-codes"] }
+    ]},
+    { id: "svelte", name: "Svelte", sourceOnly: true, samples: [
+      { id: "svelte-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/svelte"),
+        desc: "Svelte integration with video and image capture components for barcode scanning.",
+        tags: ["camera","getting started"], materials: ["mixed-codes"] }
+    ]},
+    { id: "es6", name: "ES6", sourceOnly: true, samples: [
+      { id: "es6-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/es6"),
+        desc: "ES6 module import for barcode scanning. No bundler required.",
+        tags: ["camera","getting started","es6"], materials: ["mixed-codes"] }
+    ]},
+    { id: "native-ts", name: "Native TypeScript", sourceOnly: true, samples: [
+      { id: "native-ts-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/native-ts"),
+        desc: "Native TypeScript barcode scanning sample with Rollup bundling.",
+        tags: ["camera","getting started","typescript"], materials: ["mixed-codes"] }
+    ]},
+    { id: "pwa", name: "PWA", sourceOnly: true, samples: [
+      { id: "pwa-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/pwa"),
+        desc: "Progressive Web App barcode scanner with offline support via service worker.",
+        tags: ["camera","getting started","pwa","offline"], materials: ["mixed-codes"] }
+    ]},
+    { id: "electron", name: "Electron", sourceOnly: true, samples: [
+      { id: "electron-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/electron"),
+        desc: "Electron desktop app with barcode scanning via the Dynamsoft SDK.",
+        tags: ["camera","getting started","desktop"], materials: ["mixed-codes"] }
+    ]},
+    { id: "capacitor", name: "Capacitor", sourceOnly: true, samples: [
+      { id: "capacitor-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/capacitor"),
+        desc: "Capacitor hybrid mobile app with barcode scanning for iOS and Android.",
+        tags: ["camera","getting started","mobile"], materials: ["mixed-codes"] }
+    ]},
+    { id: "blazor", name: "Blazor", sourceOnly: true, samples: [
+      { id: "blazor-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/blazor"),
+        desc: "Blazor WebAssembly barcode scanning with JS interop.",
+        tags: ["camera","getting started","blazor"], materials: ["mixed-codes"] }
+    ]},
+    { id: "maui-blazor-hybrid", name: "MAUI Blazor Hybrid", sourceOnly: true, samples: [
+      { id: "maui-blazor-hybrid-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/maui-blazor-hybrid"),
+        desc: ".NET MAUI Blazor Hybrid barcode scanning for cross-platform native apps.",
+        tags: ["camera","getting started","maui","blazor"], materials: ["mixed-codes"] }
+    ]},
+    { id: "requirejs", name: "RequireJS", sourceOnly: true, samples: [
+      { id: "requirejs-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/requirejs"),
+        desc: "AMD/RequireJS barcode scanning sample.",
+        tags: ["camera","getting started","amd"], materials: ["mixed-codes"] }
+    ]},
+    { id: "webview", name: "WebView", sourceOnly: true, samples: [
+      { id: "webview-hello-world", title: "Hello World", group: "basics", path: null, source: srcDir("frameworks/webview"),
+        desc: "WebView-based barcode scanning for embedding in native apps.",
+        tags: ["camera","getting started","webview"], materials: ["mixed-codes"] }
+    ]}
+  ];
+
+  var state = { framework: "vanilla", filter: "all", query: "", selected: null };
+
+  var listEl = document.getElementById("list");
+  var detailEl = document.getElementById("detail");
+  var detailContent = document.getElementById("detailContent");
+  var backdrop = document.getElementById("backdrop");
+  var lightbox = document.getElementById("lightbox");
+  var lightboxImg = document.getElementById("lightboxImg");
+  var lightboxCaption = document.getElementById("lightboxCaption");
+  var toastEl = document.getElementById("toast");
+
+  var IS_MOBILE_DEVICE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.userAgentData && navigator.userAgentData.mobile);
+  function isPhoneLayout() { return window.matchMedia("(max-width: 860px)").matches; }
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function groupLabel(id) {
+    for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i].id === id) return GROUPS[i].label;
+    return id;
+  }
+
+  function currentFramework() {
+    for (var i = 0; i < FRAMEWORKS.length; i++)
+      if (FRAMEWORKS[i].id === state.framework) return FRAMEWORKS[i];
+    return FRAMEWORKS[0];
+  }
+
+  /* ---------- tabs ---------- */
+
+  function renderTabs() {
+    var html = "";
+    FRAMEWORKS.forEach(function (fw) {
+      html += '<button class="tab' + (state.framework === fw.id ? " active" : "") + '" type="button" data-fw="' + fw.id + '">' +
+        esc(fw.name) + '<span class="tab-count">' + fw.samples.length + '</span></button>';
+    });
+    document.getElementById("tabs").innerHTML = html;
+  }
+
+  /* ---------- list ---------- */
+
+  function matches(s) {
+    if (state.filter === "nocam" && !s.noCamera) return false;
+    if (state.filter !== "all" && state.filter !== "nocam" && s.group !== state.filter) return false;
+    if (state.query) {
+      var hay = (s.title + " " + s.desc + " " + (s.path || "") + " " + s.tags.join(" ")).toLowerCase();
+      if (hay.indexOf(state.query) === -1) return false;
+    }
+    return true;
+  }
+
+  function renderList() {
+    var samples = currentFramework().samples;
+    var html = "";
+    var total = 0;
+    GROUPS.forEach(function (g) {
+      var items = samples.filter(function (s) { return s.group === g.id && matches(s); });
+      if (!items.length) return;
+      total += items.length;
+      html += '<div class="group"><h3 class="group-title">' + esc(g.label) + ' <span class="count">(' + items.length + ")</span></h3><div class=\"items\">";
+      items.forEach(function (s) {
+        html += '<button class="sample' + (state.selected === s.id ? " active" : "") + '" type="button" data-id="' + s.id + '">' +
+          '<span class="sample-title">' + esc(s.title) + "</span>" +
+          '<span class="sample-desc">' + esc(s.desc) + "</span>" +
+          '<span class="tags">' + s.tags.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") +
+          (s.noCamera ? '<span class="tag nocam">No camera needed</span>' : "") +
+          "</span></button>";
+      });
+      html += "</div></div>";
+    });
+    listEl.innerHTML = total ? html : '<div class="empty">No samples match your search.</div>';
+  }
+
+  /* ---------- detail ---------- */
+
+  function renderPlaceholder() {
+    detailContent.innerHTML = '<div class="empty">Select a sample from the list to see its details.</div>';
+  }
+
+  function renderDetail(s) {
+    var fw = currentFramework();
+    var isSourceOnly = fw.sourceOnly;
+    var url = s.path ? absoluteUrl(s.path) : null;
+    var html =
+      "<h2>" + esc(s.title) + "</h2>" +
+      '<div class="badges"><span class="tag">' + esc(groupLabel(s.group)) + "</span>" +
+      (s.noCamera ? '<span class="tag nocam">No camera needed</span>' : "") + "</div>" +
+      '<p class="desc">' + esc(s.desc) + "</p>" +
+      '<div class="actions">';
+
+    if (!isSourceOnly && s.path) {
+      html += '<a class="btn primary" href="' + esc(s.path) + '" target="_blank" rel="noopener">Open demo</a>';
+    }
+    html += '<a class="btn' + (isSourceOnly ? ' primary' : '') + '" href="' + esc(s.source) + '" target="_blank" rel="noopener">' + (isSourceOnly ? 'View source on GitHub' : 'Source') + '</a>';
+    if (url) {
+      html += '<button class="btn" type="button" data-copy="' + esc(url) + '">Copy link</button>';
+    }
+    html += "</div>";
+
+    if (!isSourceOnly && s.path) {
+      var matCount = (s.materials || []).filter(function (mid) { return MATERIALS[mid]; }).length;
+      var multi = matCount > 1;
+
+      if (s.noCamera) {
+        html += '<div class="qr-section"><div class="qr-side"><strong>Runs fine on this computer</strong>' +
+          "<p>This sample does not need a camera, so there is no QR handoff. Just open the demo here. The " + (multi ? "images" : "image") + " below can be downloaded as test input.</p></div></div>";
+      } else {
+        html += '<div class="qr-section"><div class="qr-card" id="sampleQr"></div>' +
+          '<div class="qr-side"><strong>Open on your phone</strong>' +
+          "<p>Scan this QR code with your phone camera to launch the sample, then point your phone at the " + (multi ? "images" : "image") + " below.</p>" +
+          '<code class="url">' + esc(url) + "</code></div></div>";
+      }
+
+      if (matCount) {
+        html += '<div class="materials"><h3>' + (multi ? "Scan materials" : "Scan material") + "</h3>" +
+          '<p class="mat-note">' + (s.noCamera
+            ? (multi ? "Download an image and feed it to the sample." : "Download this image and feed it to the sample.")
+            : (multi ? "Point your phone (running the sample) at any of these images. Click to enlarge." : "Point your phone (running the sample) at this image. Click to enlarge.")) + "</p>" +
+          '<div class="mat-grid' + (multi ? " multi" : "") + '">';
+        s.materials.forEach(function (mid) {
+          var m = MATERIALS[mid];
+          if (!m) return;
+          var fileUrl = MATERIAL_DIR + m.file;
+          html += '<button class="preview" type="button" data-full="' + esc(fileUrl) + '" data-label="' + esc(m.label) + '">' +
+            '<img src="' + esc(fileUrl) + '" alt="' + esc(m.label) + '" loading="lazy">' +
+            '<span class="mat-label">' + esc(m.label) + "</span></button>";
+        });
+        html += "</div></div>";
+      }
+    }
+
+    detailContent.innerHTML = html;
+
+    var qrHost = document.getElementById("sampleQr");
+    if (qrHost) {
+      try { qrHost.innerHTML = MiniQR.toSvg(url); }
+      catch (e) { qrHost.innerHTML = '<div class="fallback">QR unavailable</div>'; }
+    }
+
+    // graceful fallback for material images that have not been added yet
+    var imgs = detailContent.querySelectorAll(".preview img");
+    for (var i = 0; i < imgs.length; i++) {
+      imgs[i].addEventListener("error", function () {
+        var btn = this.closest(".preview");
+        if (!btn) return;
+        var file = btn.getAttribute("data-full").split("/").pop();
+        btn.outerHTML = '<span class="fallback"><span>Scan material coming soon</span><code>' + esc(file) + "</code></span>";
+      });
+    }
+  }
+
+  function selectSample(id) {
+    state.selected = id;
+    var samples = currentFramework().samples;
+    var s = null;
+    for (var i = 0; i < samples.length; i++) if (samples[i].id === id) s = samples[i];
+    if (!s) return;
+    renderDetail(s);
+    var buttons = listEl.querySelectorAll(".sample");
+    for (var j = 0; j < buttons.length; j++) {
+      buttons[j].classList.toggle("active", buttons[j].getAttribute("data-id") === id);
+    }
+    if (isPhoneLayout()) openSheet();
+  }
+
+  /* ---------- bottom sheet (phone) ---------- */
+
+  function openSheet() { detailEl.classList.add("open"); backdrop.classList.add("active"); }
+  function closeSheet() { detailEl.classList.remove("open"); backdrop.classList.remove("active"); }
+
+  /* ---------- lightbox ---------- */
+
+  function openLightbox(srcUrl, caption) {
+    lightboxImg.src = srcUrl;
+    lightboxImg.alt = caption || "Scan material";
+    lightboxCaption.textContent = caption || "";
+    lightbox.classList.add("open");
+  }
+  function closeLightbox() { lightbox.classList.remove("open"); lightboxImg.src = ""; }
+
+  /* ---------- toast & copy ---------- */
+
+  var toastTimer = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 1800);
+  }
+
+  function copyText(text) {
+    function done() { toast("Link copied, send it to your phone"); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { legacyCopy(text); done(); });
+    } else {
+      legacyCopy(text); done();
+    }
+  }
+  function legacyCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) { /* ignore */ }
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- chips & search ---------- */
+
+  function renderChips() {
+    var samples = currentFramework().samples;
+    var activeGroups = {};
+    samples.forEach(function (s) { activeGroups[s.group] = true; });
+    var hasNoCam = samples.some(function (s) { return s.noCamera; });
+
+    var chips = [{ id: "all", label: "All samples" }]
+      .concat(GROUPS.filter(function (g) { return activeGroups[g.id]; }).map(function (g) { return { id: g.id, label: g.label }; }));
+    if (hasNoCam) chips.push({ id: "nocam", label: "No camera needed" });
+
+    var chipsEl = document.getElementById("chips");
+    chipsEl.innerHTML = chips.map(function (c) {
+      return '<button class="chip' + (state.filter === c.id ? " active" : "") + '" type="button" data-filter="' + c.id + '">' + esc(c.label) + "</button>";
+    }).join("");
+  }
+
+  /* ---------- hash routing ---------- */
+
+  function parseHash() {
+    var h = location.hash.slice(1);
+    if (!h) return;
+    var parts = h.split("/");
+    var fw = parts[0];
+    var sampleId = parts[1] || null;
+    for (var i = 0; i < FRAMEWORKS.length; i++) {
+      if (FRAMEWORKS[i].id === fw) {
+        state.framework = fw;
+        if (sampleId) state.selected = sampleId;
+        return;
+      }
+    }
+  }
+
+  /* ---------- events ---------- */
+
+  document.getElementById("netPill").addEventListener("click", function () {
+    var panel = document.getElementById("netPanel");
+    panel.hidden = !panel.hidden;
+  });
+  document.addEventListener("click", function (e) {
+    var panel = document.getElementById("netPanel");
+    if (!panel.hidden && !e.target.closest(".net-panel") && !e.target.closest(".net-pill")) {
+      panel.hidden = true;
+    }
+  });
+
+  listEl.addEventListener("click", function (e) {
+    var btn = e.target.closest(".sample");
+    if (btn) selectSample(btn.getAttribute("data-id"));
+  });
+
+  document.getElementById("tabs").addEventListener("click", function (e) {
+    var tab = e.target.closest("[data-fw]");
+    if (!tab) return;
+    state.framework = tab.getAttribute("data-fw");
+    state.selected = null;
+    state.filter = "all";
+    state.query = "";
+    document.getElementById("search").value = "";
+    location.hash = state.framework === "vanilla" ? "" : state.framework;
+    renderTabs();
+    renderChips();
+    renderList();
+    renderPlaceholder();
+  });
+
+  document.getElementById("chips").addEventListener("click", function (e) {
+    var chip = e.target.closest(".chip");
+    if (!chip) return;
+    state.filter = chip.getAttribute("data-filter");
+    renderChips();
+    renderList();
+  });
+
+  document.getElementById("search").addEventListener("input", function () {
+    state.query = this.value.trim().toLowerCase();
+    renderList();
+  });
+
+  detailContent.addEventListener("click", function (e) {
+    var copyBtn = e.target.closest("[data-copy]");
+    if (copyBtn) { copyText(copyBtn.getAttribute("data-copy")); return; }
+    var preview = e.target.closest(".preview");
+    if (preview) openLightbox(preview.getAttribute("data-full"), preview.getAttribute("data-label"));
+  });
+
+  document.getElementById("sheetClose").addEventListener("click", closeSheet);
+  backdrop.addEventListener("click", closeSheet);
+  document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", function (e) { if (e.target === lightbox) closeLightbox(); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (lightbox.classList.contains("open")) closeLightbox();
+    else if (detailEl.classList.contains("open")) closeSheet();
+  });
+
+  var backToTop = document.getElementById("backToTop");
+  window.addEventListener("scroll", function () {
+    backToTop.classList.toggle("show", window.scrollY > 400);
+  }, { passive: true });
+  backToTop.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+
+  window.addEventListener("resize", function () {
+    if (!isPhoneLayout()) {
+      closeSheet();
+      if (!state.selected) selectSample(currentFramework().samples[0].id);
+    }
+  });
+
+  window.addEventListener("hashchange", function () {
+    parseHash();
+    renderTabs();
+    renderChips();
+    renderList();
+    if (state.selected) selectSample(state.selected);
+    else renderPlaceholder();
+  });
+
+  /* ---------- init ---------- */
+
+  parseHash();
+  renderTabs();
+  renderChips();
+  renderList();
+  renderPlaceholder();
+  if (!isPhoneLayout()) selectSample(currentFramework().samples[0].id);
+
+  if (IS_MOBILE_DEVICE) {
+    document.getElementById("handoffTitle").textContent = "📱 You're on a mobile device, perfect for scanning";
+    document.getElementById("handoffDesc").textContent = "Pick any sample below to start scanning with your camera.";
+    document.querySelector(".steps-row").style.display = "none";
+  }
+
+  renderPageQr();
+  renderNetHint();
+})();
+  </script>
+</body>
+</html>

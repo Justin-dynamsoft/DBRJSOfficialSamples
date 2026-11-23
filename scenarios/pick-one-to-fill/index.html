@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pick One To Fill</title>
+  <link rel="stylesheet" href="./index.css">
+  <!-- Include Dynamsoft Barcode Reader Bundle via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.6.5000/dist/dbr.bundle.js"></script>
+  <!-- If the network is unstable or you prefer to self-host the SDK, uncomment the line below to load it locally -->
+  <!-- <script src="../../../dist/dbr.bundle.js"></script> -->
+</head>
+
+<body>
+  <div class="container">
+    <!-- This div will host the barcode scanner's camera view -->
+    <div class="barcode-scanner-view"></div>
+    <div class="guide-view">
+      <span>Please click the "<span style="color: #999999;">Open Camera</span>" button below to open the scanning interface.</span>
+    </div>
+
+    <div class="form-view">
+      <div class="item pn">
+        <label class="title">Product Name: </label>
+        <input type="text">
+      </div>
+      <div class="item sn">
+        <label class="title">SN: </label>
+        <div class="content">
+          <input type="text">
+          <button class="open-btn open-sn">Open Camera</button>
+          <button class="decode-btn decode-sn">Decode to Auto-Fill</button>
+        </div>
+      </div>
+      <div class="item mac">
+        <label class="title">MAC: </label>
+        <div class="content">
+          <input type="text">
+          <button class="open-btn open-mac">Open Camera</button>
+          <button class="decode-btn decode-mac">Decode to Auto-Fill</button>
+        </div>
+      </div>
+      <div class="item eid">
+        <label class="title">EID: </label>
+        <div class="content">
+          <input type="text">
+          <button class="open-btn open-eid">Open Camera</button>
+          <button class="decode-btn decode-mac">Decode to Auto-Fill</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const guideView = document.querySelector(".guide-view");
+    const barcodeScannerView = document.querySelector(".barcode-scanner-view");
+    const scanBtns = document.querySelectorAll(".open-btn");
+    const decodeBtns = document.querySelectorAll(".decode-btn");
+
+    Dynamsoft.License.LicenseManager.initLicense("DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAxMjkzMzk1LU1UQXhNamt6TXprMUxYZGxZaTFVY21saGJGQnliMm8iLCJtYWluU2VydmVyVVJMIjoiaHR0cHM6Ly9tZGxzLmR5bmFtc29mdG9ubGluZS5jb20vIiwib3JnYW5pemF0aW9uSUQiOiIxMDEyOTMzOTUiLCJzdGFuZGJ5U2VydmVyVVJMIjoiaHR0cHM6Ly9zZGxzLmR5bmFtc29mdG9ubGluZS5jb20vIiwiY2hlY2tDb2RlIjotMjAwNjc1NDA0OX0=");
+    const pInit = (async () => {
+      const cameraView = await Dynamsoft.DCE.CameraView.createInstance();
+      const cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(cameraView);
+      const cvRouter = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+
+      cvRouter.setInput(cameraEnhancer);
+      barcodeScannerView.append(cameraView.getUIElement());
+
+      return {
+        cameraView,
+        cameraEnhancer,
+        cvRouter
+      }
+    })();
+
+    for (let i = 0; i < scanBtns.length; i++) {
+      const scanBtn = scanBtns[i];
+      const decodeBtn = decodeBtns[i];
+
+      scanBtn.addEventListener("click", async (e) => {
+        const { cameraView, cameraEnhancer, cvRouter } = await pInit;
+        if (cameraEnhancer.isOpen()) return;
+        await cameraEnhancer.open();
+
+        const target = e.target.classList[1].split("-")[1];
+        const targetInput = document.querySelector(`.${target} input`);
+
+        const resultReceiver = new Dynamsoft.CVR.CapturedResultReceiver();
+        resultReceiver.onDecodedBarcodesReceived = (result) => {
+          //  Display the first detected barcode's text in an alert
+          targetInput.value = result.barcodeResultItems[0].text;
+          guideView.style.display = "flex";
+          barcodeScannerView.style.display = "none";
+          scanBtn.style.display = "inline-block";
+          decodeBtn.style.display = "none";
+          decodeBtn.innerText = "Decode to Auto-Fill";
+          cameraEnhancer.close();
+          cvRouter.stopCapturing();
+          cvRouter.removeResultReceiver(resultReceiver);
+        }
+        await cvRouter.addResultReceiver(resultReceiver);
+
+        guideView.style.display = "none";
+        barcodeScannerView.style.display = "block";
+        scanBtn.style.display = "none";
+        decodeBtn.style.display = "inline-block";
+      })
+
+      decodeBtn.addEventListener("click", async () => {
+        decodeBtn.innerText = "Scanning...";
+        const { cameraView, cameraEnhancer, cvRouter } = await pInit;
+        await cvRouter.startCapturing("ReadSingleBarcode");
+      })
+    }
+  </script>
+</body>
+
+</html>

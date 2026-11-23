@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamsoft Barcode Scanner Sample - Scan oneD Retail codes</title>
+  <link rel="stylesheet" href="./index.css">
+  <!-- Include Dynamsoft Barcode Reader Bundle via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.6.5000/dist/dbr.bundle.js"></script>
+  <!-- If the network is unstable or you prefer to self-host the SDK, uncomment the line below to load it locally -->
+  <!-- <script src="../../../dist/dbr.bundle.js"></script> -->
+</head>
+
+<body>
+  <h1 class="barcode-scanner-title">Scan oneD Retail codes</h1>
+  <!-- This div will host the barcode scanner's camera view -->
+  <div class="barcode-scanner-view"></div>
+  <div class="result-view"></div>
+
+  <script>
+    Dynamsoft.License.LicenseManager.initLicense("DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAxMjkzMzk1LU1UQXhNamt6TXprMUxYZGxZaTFVY21saGJGQnliMm8iLCJtYWluU2VydmVyVVJMIjoiaHR0cHM6Ly9tZGxzLmR5bmFtc29mdG9ubGluZS5jb20vIiwib3JnYW5pemF0aW9uSUQiOiIxMDEyOTMzOTUiLCJzdGFuZGJ5U2VydmVyVVJMIjoiaHR0cHM6Ly9zZGxzLmR5bmFtc29mdG9ubGluZS5jb20vIiwiY2hlY2tDb2RlIjotMjAwNjc1NDA0OX0=");
+    (async () => {
+      try {
+        const cameraView = await Dynamsoft.DCE.CameraView.createInstance();
+        const cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(cameraView);
+        const cvRouter = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+
+        cvRouter.setInput(cameraEnhancer);
+
+        const resultReceiver = new Dynamsoft.CVR.CapturedResultReceiver();
+        const resultView = document.querySelector(".result-view");
+        resultReceiver.onDecodedBarcodesReceived = (result) => {
+          resultView.innerHTML = "";
+          for (let item of result.barcodeResultItems) {
+            const div = document.createElement("div");
+            div.innerHTML = `format: ${item.formatString}<br> text: ${item.text} <br> ------------------`;
+            resultView.append(div);
+          }
+        }
+        await cvRouter.addResultReceiver(resultReceiver);
+        await cvRouter.initSettings("./ReadOneDRetail.json");
+
+        document.querySelector(".barcode-scanner-view").append(cameraView.getUIElement());
+        await cameraEnhancer.open();
+        await cvRouter.startCapturing("ReadOneDRetail");
+      } catch (ex) {
+        alert(ex.message || ex);
+      }
+    })();
+  </script>
+</body>
+
+</html>

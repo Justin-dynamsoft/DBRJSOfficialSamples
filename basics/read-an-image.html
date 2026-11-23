@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="description" content="Read barcodes from an image with Dynamsoft Barcode Reader." />
+  <meta name="keywords" content="barcode, image" />
+  <link rel="canonical" href="https://demo.dynamsoft.com/Samples/DBR/JS/basics/read-an-image.html" />
+  <title>Dynamsoft Barcode Reader Sample - Hello World (Read an Image)</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.6.5000/dist/dbr.bundle.js"></script>
+  <!-- If the network is unstable or you prefer to self-host the SDK, uncomment the line below to load it locally -->
+  <!-- <script src="../../dist/dbr.bundle.js"></script> -->
+</head>
+
+<body>
+  <h1>Hello World (Read an Image)</h1>
+  <input id="input-file" type="file" accept=".jpg,.jpeg,.icon,.gif,.svg,.webp,.png,.bmp,.pdf" />
+  <span id="decoding" style="display: none;">Decoding...</span>
+  <br />
+  Results:<br />
+  <div id="results"></div>
+  <canvas id="preview-canvas" style="display: none; max-width: 100%; max-height: 60vh; margin-top: 12px; border: 1px solid #ddd;"></canvas>
+  <script>
+    // Configure the WASM engine to include PDF support.
+    Dynamsoft.Core.CoreModule.wasmLoadOptions = {
+      wasmType: Dynamsoft.Core.EnumWasmType.ML_SIMD_WITH_PDF,
+    };
+    /** LICENSE ALERT - README
+     * To use the library, you need to first specify a license key.
+     *
+     * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=samples&product=dbr&package=js to get your own trial license good for 30 days.
+     * Note that if you downloaded this sample from Dynamsoft while logged in, the above license key may already be your own 30-day trial license.
+     * For more information, see https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/index.html#license&utm_source=samples or contact support@dynamsoft.com.
+     * LICENSE ALERT - THE END
+     */
+    Dynamsoft.License.LicenseManager.initLicense("DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAxMjkzMzk1LU1UQXhNamt6TXprMUxYZGxZaTFVY21saGJGQnliMm8iLCJtYWluU2VydmVyVVJMIjoiaHR0cHM6Ly9tZGxzLmR5bmFtc29mdG9ubGluZS5jb20vIiwib3JnYW5pemF0aW9uSUQiOiIxMDEyOTMzOTUiLCJzdGFuZGJ5U2VydmVyVVJMIjoiaHR0cHM6Ly9zZGxzLmR5bmFtc29mdG9ubGluZS5jb20vIiwiY2hlY2tDb2RlIjotMjAwNjc1NDA0OX0=");
+
+    // Optional. Preload the deep-learning models required for barcode localization and decoding.
+    // If models are not preloaded, it will be lazy-loaded when they are used, resulting in slower first decoding.
+    const MODELS = ["OneDLocalization", "DataMatrixQRCodeLocalization", "Code128Decoder", "EAN13Decoder", "Code39ITFDecoder"];
+    Dynamsoft.CVR.CaptureVisionRouter.appendDLModelBuffer(MODELS);
+
+    const resultsContainer = document.querySelector("#results");
+    const previewCanvas = document.querySelector("#preview-canvas");
+    const previewCtx = previewCanvas.getContext("2d");
+    let currentObjectUrl = null;
+
+    function loadImage(file) {
+      return new Promise((resolve, reject) => {
+        if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+        currentObjectUrl = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = currentObjectUrl;
+      });
+    }
+
+    function drawImageAndHighlights(img, barcodeResultItems = []) {
+      previewCanvas.width = img.naturalWidth;
+      previewCanvas.height = img.naturalHeight;
+      previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewCtx.drawImage(img, 0, 0);
+      previewCanvas.style.display = "block";
+
+      if (!barcodeResultItems.length) return;
+
+      const lineWidth = Math.max(2, Math.round(Math.max(img.naturalWidth, img.naturalHeight) / 300));
+      previewCtx.lineWidth = lineWidth;
+      previewCtx.strokeStyle = "#00e500";
+      previewCtx.fillStyle = "rgba(0, 229, 0, 0.18)";
+
+      for (const item of barcodeResultItems) {
+        const points = item.location?.points;
+        if (!points || points.length < 4) continue;
+        previewCtx.beginPath();
+        previewCtx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          previewCtx.lineTo(points[i].x, points[i].y);
+        }
+        previewCtx.closePath();
+        previewCtx.fill();
+        previewCtx.stroke();
+      }
+    }
+
+    const pInit = (async () => {
+      const cvRouter = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+
+      return { cvRouter }
+    })();
+
+    document.querySelector("#input-file").addEventListener("change", async function (e) {
+      let file = e.target.files[0];
+      this.value = "";
+      if (!file) return;
+      resultsContainer.innerText = "";
+      previewCanvas.style.display = "none";
+      previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+      try {
+        document.querySelector("#decoding").style.display = "inline"; // Show decoding indicator during the decoding process
+        const pImg = file.type !== "application/pdf" ? loadImage(file).then((img) => {
+          drawImageAndHighlights(img);
+          return img;
+        }) : Promise.resolve(null);
+
+        // Decode selected image with 'ReadBarcodes_ReadRateFirst' template.
+        const { cvRouter } = await pInit;
+        let result;
+        if (file.type === "application/pdf") {
+          const _result = await cvRouter.captureMultiPages(file, "ReadBarcodes_ReadRateFirst");
+          result = _result[0];
+        } else {
+          result = await cvRouter.capture(file, "ReadBarcodes_ReadRateFirst");
+        }
+        const barcodeResultItems = result.decodedBarcodesResult?.barcodeResultItems;
+        const img = await pImg;
+        if (img) {
+          drawImageAndHighlights(img, barcodeResultItems || []);
+        }
+
+        if (!barcodeResultItems || !barcodeResultItems.length) {
+          resultsContainer.innerText += "No barcode found\n";
+          return;
+        }
+
+        for (let item of barcodeResultItems) {
+          resultsContainer.innerText += item.text + "\n";
+          console.log(item.text);
+        }
+      } catch (ex) {
+        let errMsg = ex.message || ex;
+        console.error(ex);
+        alert(errMsg);
+      } finally {
+        document.querySelector("#decoding").style.display = "none"; // Hide decoding indicator after the decoding process
+      }
+    });
+  </script>
+</body>
+
+</html>
